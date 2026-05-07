@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cebuano Dictionary</title>
+    <style>
+        :root {
+            /* Updated to a clean Teal to match modern, light UI aesthetics */
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            
+            /* Adaptive transparent colors for host website blending */
+            --bg-color: transparent; 
+            --surface: rgba(255, 255, 255, 0.65); 
+            --surface-solid: rgba(255, 255, 255, 0.9);
+            
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: rgba(226, 232, 240, 0.8);
+            --pos-bg: #ccfbf1;
+            --pos-text: #0f766e;
+            --highlight: #fef08a;
+            --highlight-text: #854d0e;
+            --danger: #ef4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color); /* Adapts to parent website */
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Floating Sticky Header */
+        header {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 12px 24px;
+            position: sticky;
+            top: 16px; 
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            max-width: 900px;
+            margin: 16px auto;
+            border-radius: 24px; 
+            gap: 20px;
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .db-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            padding-left: 36px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+        }
+
+        .status-dot.syncing { background-color: #f59e0b; animation: pulse 1s infinite; }
+        .status-dot.error { background-color: var(--danger); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Search Section in Header */
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+            max-width: 500px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            width: 20px;
+            height: 20px;
+            fill: var(--text-muted);
+            transition: fill 0.3s ease;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 14px 44px; /* Padding for both icons */
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            background: var(--surface-solid);
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+        }
+
+        #searchInput:focus + .search-icon {
+            fill: var(--primary);
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: none; /* Hidden by default */
+            padding: 4px;
+            border-radius: 50%;
+        }
+
+        .clear-btn:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--border);
+            color: var(--text-main);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 800px;
+            margin: 20px auto 40px;
+            padding: 0 20px;
+        }
+
+        .search-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 16px;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 20px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab {
+            padding: 10px 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Results & Entries */
+        .results-container {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .status-message {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .entry {
+            background: var(--surface-solid);
+            backdrop-filter: blur(8px);
+            padding: 24px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .entry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .word-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-right: 40px;
+        }
+
+        .word {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .speak-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            cursor: pointer;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .speak-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .pos {
+            background: var(--pos-bg);
+            color: var(--pos-text);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .bookmark-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+
+        .bookmark-btn.saved {
+            color: #fbbf24;
+            opacity: 1;
+        }
+
+        .bookmark-btn:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .definition {
+            color: var(--text-main);
+            font-size: 1rem;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+
+        .meaning-block {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 12px;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .meaning-num {
+            font-weight: 800;
+            color: var(--primary);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .pos-separator {
+            display: inline-block;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.03);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin: 12px 0 6px 0;
+            border: 1px solid var(--border);
+        }
+
+        mark {
+            background-color: var(--highlight);
+            color: var(--highlight-text);
+            padding: 0 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Home State (WOTD & History) */
+        .home-state {
+            display: none; 
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .wotd-card {
+            background: linear-gradient(135deg, var(--pos-bg) 0%, var(--surface-solid) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .wotd-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .history-section h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 0 0 12px 0;
+            font-weight: 600;
+        }
+
+        .history-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chip {
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .chip:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* Notepad View */
+        .notepad-state {
+            display: none; 
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .notepad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notepad-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .notepad-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .copy-btn {
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .save-indicator {
+            font-size: 0.85rem;
+            color: #10b981;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notepad-textarea {
+            width: 100%;
+            height: 350px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface-solid);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            box-sizing: border-box;
+        }
+
+        .notepad-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02), 0 0 0 4px rgba(13, 148, 136, 0.15);
+        }
+
+        /* Tooltip hint */
+        .dbl-click-hint {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: -10px;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 650px) {
+            header {
+                flex-wrap: wrap;
+                margin: 10px;
+                padding: 12px 16px;
+            }
+            .search-container {
+                order: 3;
+                width: 100%;
+                max-width: 100%;
+                margin-top: 4px;
+            }
+            .logo-text { display: none; } 
+            .db-status-indicator {
+                padding-left: 0;
+                margin-top: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand-container">
+        <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            <span class="logo-text">Cebuano</span>
+        </div>
+        <div class="db-status-indicator">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="dbStatus">Initializing...</span>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Loading dictionary..." autocomplete="off" disabled>
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <button class="clear-btn" id="clearSearchBtn" title="Clear Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <div class="header-actions">
+        <button class="icon-btn" onclick="clearDatabase()" title="Clear Cache & Reload Database">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+    </div>
+</header>
+
+<main>
+    <div class="search-options">
+        <div class="toggle-group">
+            <label class="toggle-label">
+                <input type="checkbox" id="searchMeaningToggle">
+                Search in English Definitions
+            </label>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" id="tab-search" onclick="switchTab('search')">Search Results</div>
+        <div class="tab" id="tab-bookmarks" onclick="switchTab('bookmarks')">Bookmarks (<span id="bookmarkCount">0</span>)</div>
+        <div class="tab" id="tab-notepad" onclick="switchTab('notepad')">Practice Pad</div>
+    </div>
+    
+    <div class="dbl-click-hint" id="dblClickHint" style="display: none;">💡 Tip: Double-click any word to search for it immediately.</div>
+
+    <div id="homeState" class="home-state">
+        <div class="wotd-card" id="wotdContainer">
+            <div class="wotd-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Word of the Day
+            </div>
+            <div id="wotdContent">Loading...</div>
+        </div>
+
+        <div class="history-section" id="historySection" style="display: none;">
+            <h3>Recent Searches</h3>
+            <div class="history-chips" id="historyChips">
+                </div>
+        </div>
+    </div>
+
+    <ul class="results-container" id="resultsList" style="display: none;"></ul>
+
+    <div id="notepadState" class="notepad-state">
+        <div class="notepad-header">
+            <h3>Draft Sentences</h3>
+            <div class="notepad-controls">
+                <span class="save-indicator" id="saveIndicator">Saved!</span>
+                <button class="copy-btn" id="copyPadBtn" onclick="copyNotepad()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy All
+                </button>
+            </div>
+        </div>
+        <textarea class="notepad-textarea" id="practicePad" placeholder="Type here to practice constructing sentences. Your notes are automatically saved to your local database as you type..."></textarea>
+    </div>
+</main>
+
+<script>
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/ministify/dictionceb/refs/heads/main/dictionceb';
+    const DB_NAME = 'CebuanoDictDB';
+    const STORE_ENTRIES = 'entries';
+    const STORE_NOTES = 'notes';
+    const DB_VERSION = 18; 
+
+    let dictionaryData = [];
+    let bookmarks = JSON.parse(localStorage.getItem('ceb-bookmarks')) || [];
+    let searchHistory = JSON.parse(localStorage.getItem('ceb-history')) || [];
+    let activeTab = 'search';
+
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const resultsList = document.getElementById('resultsList');
+    const homeState = document.getElementById('homeState');
+    const notepadState = document.getElementById('notepadState');
+    const dbStatus = document.getElementById('dbStatus');
+    const statusDot = document.getElementById('statusDot');
+    const searchMeaningToggle = document.getElementById('searchMeaningToggle');
+    const bookmarkCount = document.getElementById('bookmarkCount');
+    const practicePad = document.getElementById('practicePad');
+    const saveIndicator = document.getElementById('saveIndicator');
+    const dblClickHint = document.getElementById('dblClickHint');
+
+    bookmarkCount.innerText = bookmarks.length;
+
+    // Database Initialization
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = (event) => reject('IndexedDB error: ' + event.target.error);
+            request.onsuccess = (event) => resolve(event.target.result);
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (db.objectStoreNames.contains(STORE_ENTRIES)) {
+                    db.deleteObjectStore(STORE_ENTRIES);
+                }
+                db.createObjectStore(STORE_ENTRIES, { keyPath: 'id', autoIncrement: true });
+                
+                if (!db.objectStoreNames.contains(STORE_NOTES)) {
+                    db.createObjectStore(STORE_NOTES, { keyPath: 'id' });
+                }
+            };
+        });
+    }
+
+    function getDataFromDB(db, storeName) {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    function saveDataToDB(db, entries) {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(STORE_ENTRIES, 'readwrite');
+            const store = transaction.objectStore(STORE_ENTRIES);
+            store.clear().onsuccess = () => {
+                entries.forEach(entry => store.put(entry));
+            };
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
+        });
+    }
+
+    // Note Saving & Copying Logic
+    async function saveNote(text) {
+        try {
+            const db = await initDB();
+            const tx = db.transaction(STORE_NOTES, 'readwrite');
+            const store = tx.objectStore(STORE_NOTES);
+            store.put({ id: 'practice', content: text });
+            
+            tx.oncomplete = () => {
+                saveIndicator.style.opacity = '1';
+                setTimeout(() => { saveIndicator.style.opacity = '0'; }, 2000);
+            };
+        } catch (e) {
+            console.error("Failed to save note:", e);
+        }
+    }
+
+    async function loadNote() {
+        try {
+            const db = await initDB();
+            const tx = db.transaction(STORE_NOTES, 'readonly');
+            const store = tx.objectStore(STORE_NOTES);
+            const req = store.get('practice');
+            req.onsuccess = () => {
+                if (req.result) practicePad.value = req.result.content;
+            };
+        } catch (e) {
+            console.error("Failed to load note:", e);
+        }
+    }
+
+    practicePad.addEventListener('input', debounce((e) => {
+        saveNote(e.target.value);
+    }, 800));
+
+    function copyNotepad() {
+        const text = practicePad.value;
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        
+        const btn = document.getElementById('copyPadBtn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+        btn.style.backgroundColor = "var(--primary)";
+        btn.style.color = "white";
+        
+        setTimeout(() => { 
+            btn.innerHTML = originalHtml; 
+            btn.style.backgroundColor = "";
+            btn.style.color = "";
+        }, 2000);
+    }
+
+    // Pronunciation (Text-to-Speech)
+    function speakWord(word, e) {
+        e.stopPropagation();
+        if ('speechSynthesis' in window) {
+            // Cancel any currently playing speech
+            window.speechSynthesis.cancel();
+            
+            const cleanWord = word.replace(/[^a-zA-ZñÑ\-]/g, ''); // Strip numbers/symbols
+            const utterance = new SpeechSynthesisUtterance(cleanWord);
+            
+            // Tagalog phonetics match Cebuano closely enough for TTS engines
+            utterance.lang = 'tl-PH'; 
+            utterance.rate = 0.9;
+            
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech.");
+        }
+    }
+
+    // Double Click to Search Interactive Feature
+    document.addEventListener('dblclick', () => {
+        if (activeTab !== 'search' && activeTab !== 'bookmarks') return;
+        
+        const selection = window.getSelection().toString().trim();
+        // Check if selection is a single valid word
+        if (selection && /^[a-zA-ZÀ-ÿñÑ\-]+$/.test(selection)) {
+            searchInput.value = selection;
+            clearSearchBtn.style.display = 'block';
+            switchTab('search');
+            searchInput.dispatchEvent(new Event('input'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    function removeAccents(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function toPhonetic(str) {
+        let s = removeAccents(str);
+        s = s.replace(/o/g, 'u').replace(/e/g, 'i');
+        s = s.replace(/([aui])w([aui])/g, '$1$2');
+        s = s.replace(/([aui])y([aui])/g, '$1$2');
+        return s;
+    }
+
+    function setStatus(text, dotClass) {
+        dbStatus.textContent = text;
+        statusDot.className = `status-dot ${dotClass}`;
+    }
+
+    // Core Dictionary Loader
+    async function loadDictionary() {
+        try {
+            setStatus("Syncing...", "syncing");
+            
+            homeState.style.display = 'none';
+            resultsList.style.display = 'block';
+            resultsList.innerHTML = `<li class="status-message">Checking local database...</li>`;
+            
+            const db = await initDB();
+            const storedEntries = await getDataFromDB(db, STORE_ENTRIES);
+
+            loadNote(); 
+
+            if (storedEntries && storedEntries.length > 0) {
+                dictionaryData = storedEntries;
+                activateWidget(true);
+                return;
+            }
+
+            resultsList.innerHTML = `<li class="status-message">Downloading dictionary for offline use (this takes a moment)...</li>`;
+            const response = await fetch(GITHUB_RAW_URL);
+            if (!response.ok) throw new Error('Failed to fetch from GitHub');
+
+            const rawText = await response.text();
+            const lines = rawText.split('\n');
+            const newEntries = [];
+            
+            const regex = /^([a-zA-Z0-9\-'À-ÿñÑ,]+(?:\s+\d+)?)\s+\b(n|v|a|adj|adv|pron|prn|pn|pr|prep|conj|int|interj|num|pa|part|particle|abbr|id)\b(.*)$/i;
+            let startParsing = false;
+
+            for (const line of lines) {
+                const cleanLine = line.trim();
+                if (!cleanLine) continue;
+
+                if (!startParsing) {
+                    if (cleanLine === 'A' || cleanLine.includes('a n letter A.')) startParsing = true;
+                    if (!startParsing) continue;
+                }
+
+                const match = cleanLine.match(regex);
+                if (match) {
+                    newEntries.push({
+                        word: match[1].trim(),
+                        pos: match[2].toLowerCase(),
+                        definition: match[3].trim()
+                    });
+                }
+
+                if (cleanLine.includes('yíma n candied yolk')) break;
+            }
+
+            if (newEntries.length > 0) {
+                resultsList.innerHTML = `<li class="status-message">Caching local database...</li>`;
+                await saveDataToDB(db, newEntries);
+                dictionaryData = newEntries;
+                activateWidget(false);
+            } else {
+                throw new Error("Failed to extract dictionary entries.");
+            }
+        } catch (error) {
+            console.error(error);
+            resultsList.innerHTML = `<li class="status-message" style="color: var(--danger)">Error loading dictionary: ${error.message}</li>`;
+            setStatus("Offline", "error");
+        }
+    }
+
+    function activateWidget(fromCache) {
+        searchInput.disabled = false;
+        searchInput.placeholder = `Search ${dictionaryData.length.toLocaleString()} words...`;
+        setStatus(fromCache ? "Ready" : "Saved to cache", "");
+        
+        generateWordOfTheDay();
+        renderHistory();
+        switchTab('search'); 
+    }
+
+    // Word of the Day Logic
+    function generateWordOfTheDay() {
+        if (!dictionaryData.length) return;
+        const today = new Date();
+        const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        const index = seed % dictionaryData.length;
+        const wotd = dictionaryData[index];
+        
+        document.getElementById('wotdContent').innerHTML = generateEntryHTML(wotd);
+    }
+
+    // History Logic
+    function renderHistory() {
+        const historySection = document.getElementById('historySection');
+        const historyChips = document.getElementById('historyChips');
+        
+        if (searchHistory.length === 0) {
+            historySection.style.display = 'none';
+            return;
+        }
+
+        historySection.style.display = 'block';
+        historyChips.innerHTML = searchHistory.map(term => `
+            <button class="chip" onclick="executeHistorySearch('${term}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                ${term}
+            </button>
+        `).join('');
+    }
+
+    function executeHistorySearch(term) {
+        searchInput.value = term;
+        clearSearchBtn.style.display = 'block';
+        switchTab('search');
+        searchInput.dispatchEvent(new Event('input'));
+    }
+
+    function addToHistory(term) {
+        if (!term || term.length < 2) return;
+        const exact = term.toLowerCase();
+        searchHistory = searchHistory.filter(t => t.toLowerCase() !== exact);
+        searchHistory.unshift(term);
+        searchHistory = searchHistory.slice(0, 20); 
+        localStorage.setItem('ceb-history', JSON.stringify(searchHistory));
+        renderHistory();
+    }
+
+    // Tab Switching
+    function switchTab(tab) {
+        activeTab = tab;
+        document.getElementById('tab-search').classList.remove('active');
+        document.getElementById('tab-bookmarks').classList.remove('active');
+        document.getElementById('tab-notepad').classList.remove('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+
+        homeState.style.display = 'none';
+        resultsList.style.display = 'none';
+        notepadState.style.display = 'none';
+        dblClickHint.style.display = 'none';
+
+        if (tab === 'notepad') {
+            notepadState.style.display = 'flex';
+        } else if (tab === 'bookmarks') {
+            resultsList.style.display = 'block';
+            dblClickHint.style.display = 'block';
+            showBookmarks();
+        } else {
+            const term = searchInput.value.trim();
+            if (!term) {
+                homeState.style.display = 'flex'; 
+            } else {
+                resultsList.style.display = 'block';
+                dblClickHint.style.display = 'block';
+                searchInput.dispatchEvent(new Event('input')); 
+            }
+        }
+    }
+
+    function toggleBookmark(word) {
+        const index = bookmarks.indexOf(word);
+        if (index > -1) {
+            bookmarks.splice(index, 1);
+        } else {
+            bookmarks.push(word);
+        }
+        localStorage.setItem('ceb-bookmarks', JSON.stringify(bookmarks));
+        bookmarkCount.innerText = bookmarks.length;
+        
+        if (activeTab === 'bookmarks') {
+            showBookmarks();
+        } else if (activeTab === 'search' && searchInput.value.trim()) {
+            searchInput.dispatchEvent(new Event('input')); 
+        } else if (activeTab === 'search' && !searchInput.value.trim()) {
+            generateWordOfTheDay(); 
+        }
+    }
+
+    function showBookmarks() {
+        if (bookmarks.length === 0) {
+            resultsList.innerHTML = `<li class="status-message">You haven't bookmarked any words yet. Click the star icon on any word to save it here!</li>`;
+            return;
+        }
+        const bookmarkedEntries = dictionaryData.filter(item => bookmarks.includes(item.word));
+        renderResults(bookmarkedEntries, '', true);
+    }
+
+    // Render Helpers
+    function generateEntryHTML(item, searchTerm = '') {
+        const isBookmarked = bookmarks.includes(item.word);
+        
+        let displayWord = item.word;
+        let displayDef = item.definition;
+
+        if (searchTerm) {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            if (searchMeaningToggle.checked) {
+                displayDef = displayDef.replace(regex, `<mark>$1</mark>`);
+            } else {
+                displayWord = displayWord.replace(regex, `<mark>$1</mark>`);
+            }
+        }
+
+        displayDef = displayDef.replace(/\.\s+(n|v|a|adj|adv|pron|prn|pn|pr|prep|conj|int|interj|num|pa|part|particle|abbr|id)\b\s*/gi, '.<span class="pos-separator">$1</span>');
+        const parts = displayDef.split(/(^|\.\s+|>|<br>\s*)\s*(\d+[a-z]?)\s/);
+        
+        if (parts.length > 1) {
+            let formattedDef = parts[0] + (parts[1] || "");
+            for (let i = 2; i < parts.length; i += 3) {
+                const num = parts[i];
+                let text = parts[i+1] || "";
+                let nextBoundary = (i + 2 < parts.length) ? (parts[i+2] || "") : "";
+                formattedDef += `
+                    <div class="meaning-block">
+                        <div class="meaning-num">${num}.</div>
+                        <div>${text.trim()}${nextBoundary}</div>
+                    </div>`;
+            }
+            displayDef = formattedDef;
+        }
+
+        return `
+            <div style="padding-right: 30px;">
+                <button class="bookmark-btn ${isBookmarked ? 'saved' : ''}" onclick="toggleBookmark('${item.word}')" title="Bookmark">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="${isBookmarked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </button>
+                <div class="word-header">
+                    <span class="word">${displayWord}</span>
+                    <button class="speak-btn" onclick="speakWord('${item.word}', event)" title="Listen to pronunciation">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                    <span class="pos">${item.pos}</span>
+                </div>
+                <div class="definition">${displayDef}</div>
+            </div>
+        `;
+    }
+
+    function renderResults(results, searchTerm = '', isBookmarkView = false) {
+        resultsList.innerHTML = '';
+
+        if (results.length === 0) {
+            resultsList.innerHTML = `<li class="status-message">No matches found for "<strong>${searchTerm}</strong>"</li>`;
+            return;
+        }
+
+        const displayLimit = 100;
+        const limitedResults = results.slice(0, displayLimit);
+        let htmlContent = '';
+
+        limitedResults.forEach((item) => {
+            htmlContent += `<li class="entry">${generateEntryHTML(item, searchTerm)}</li>`;
+        });
+
+        if (results.length > displayLimit) {
+            htmlContent += `<li class="status-message">Showing first ${displayLimit} of ${results.length} results. Keep typing to refine.</li>`;
+        }
+
+        resultsList.innerHTML = htmlContent;
+    }
+
+    function debounce(func, delay) {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
+
+    searchInput.addEventListener('input', debounce((e) => {
+        if (activeTab !== 'search') switchTab('search');
+        
+        const rawSearchTerm = e.target.value.trim();
+        
+        if (!rawSearchTerm) {
+            clearSearchBtn.style.display = 'none';
+            switchTab('search'); 
+            return;
+        }
+
+        clearSearchBtn.style.display = 'block';
+        homeState.style.display = 'none';
+        resultsList.style.display = 'block';
+        dblClickHint.style.display = 'block';
+
+        const isMeaningSearch = searchMeaningToggle.checked;
+        const searchExact = removeAccents(rawSearchTerm);
+        const searchPhonetic = toPhonetic(rawSearchTerm);
+
+        const filtered = dictionaryData.filter(item => {
+            if (isMeaningSearch) {
+                return item.definition.toLowerCase().includes(rawSearchTerm.toLowerCase());
+            } else {
+                const wordExact = removeAccents(item.word);
+                const wordPhonetic = toPhonetic(item.word);
+                return wordExact.startsWith(searchExact) || wordPhonetic.startsWith(searchPhonetic);
+            }
+        });
+
+        if (!isMeaningSearch) {
+            filtered.sort((a, b) => {
+                const aExact = removeAccents(a.word);
+                const bExact = removeAccents(b.word);
+                
+                if (aExact === searchExact && bExact !== searchExact) return -1;
+                if (aExact !== searchExact && bExact === searchExact) return 1;
+                
+                return aExact.localeCompare(bExact);
+            });
+        }
+
+        renderResults(filtered, rawSearchTerm);
+        
+        if (filtered.length > 0) {
+            addToHistory(rawSearchTerm);
+        }
+    }, 400)); 
+
+    clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        switchTab('search');
+    });
+
+    searchMeaningToggle.addEventListener('change', () => {
+        if(searchInput.value) {
+            searchInput.dispatchEvent(new Event('input'));
+        }
+    });
+
+    function clearDatabase() {
+        const req = indexedDB.deleteDatabase(DB_NAME);
+        req.onsuccess = () => location.reload();
+        req.onerror = () => alert("Couldn't clear database.");
+        req.onblocked = () => alert("Close other tabs running this dictionary first.");
+    }
+
+    loadDictionary();
+</script>
+</body>
+</html>
